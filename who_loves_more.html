@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Who Loves More?</title>
+<style>
+  :root {
+    --bg: #faf5f1;
+    --ink: #3e2e2e;
+    --muted: #8a7a74;
+    --rose: #a63a4c;
+    --rose-soft: #f3e3e0;
+    --gold: #c49a6c;
+    --card: #fffdfb;
+    --line: #ecd9d4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(196,154,108,.10), transparent 42%),
+      radial-gradient(circle at 88% 82%, rgba(166,58,76,.08), transparent 45%);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 620px;
+    background: var(--card);
+    border: 1px solid var(--line, #f0e2dc);
+    border-radius: 28px;
+    padding: 44px 40px 30px;
+    box-shadow: 0 24px 60px rgba(62, 46, 46, .12), 0 2px 6px rgba(62,46,46,.04);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold), var(--rose), var(--rose), var(--gold));
+    opacity: .85;
+  }
+
+  .head {
+    text-align: center;
+    margin-bottom: 34px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 40px;
+    color: var(--ink);
+    letter-spacing: .01em;
+  }
+
+  h1 span {
+    color: var(--rose);
+  }
+
+  .scale-wrap {
+    margin: 6px auto 30px;
+    max-width: 440px;
+  }
+
+  .scale-track {
+    position: relative;
+    height: 46px;
+  }
+
+  .scale-line {
+    position: absolute;
+    left: 8%; right: 8%;
+    top: 50%;
+    height: 1px;
+    background: var(--rose-soft);
+  }
+
+  .scale-dot {
+    position: absolute;
+    top: calc(50% - 2px);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--rose-soft);
+  }
+  .scale-dot.l { left: 8%; }
+  .scale-dot.r { right: 8%; }
+
+  .heart {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 26px;
+    line-height: 1;
+    transition: left .6s cubic-bezier(.34, 1.4, .64, 1);
+    will-change: left;
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 26px;
+  }
+
+  .option {
+    border: 1.5px solid var(--line, #ecd9d4);
+    border-radius: 18px;
+    padding: 22px 18px 18px;
+    background: var(--card);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .2s ease, transform .18s ease, box-shadow .2s ease, background .2s ease;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .option:hover {
+    border-color: var(--rose);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(166, 58, 60, .10);
+    background: #fffaf8;
+  }
+
+  .option:active { transform: scale(.97); }
+
+  .option .who {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 4px;
+  }
+
+  .option .phrase {
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 34px;
+    line-height: 1.35;
+  }
+
+  .option .votes {
+    margin-top: 12px;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  .option .votes small {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    font-family: "Segoe UI", Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-left: 4px;
+  }
+
+  .bar {
+    margin-top: 10px;
+    height: 6px;
+    border-radius: 6px;
+    background: var(--rose-soft);
+    overflow: hidden;
+  }
+
+  .bar i {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--gold), var(--rose));
+    transition: width .5s cubic-bezier(.25, .8, .4, 1);
+  }
+
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--rose-soft);
+    padding-top: 16px;
+  }
+
+  .total {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .total b {
+    font-size: 18px;
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    margin-right: 4px;
+  }
+
+  .reset {
+    font-size: 12px;
+    letter-spacing: .06em;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 18px;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+
+  .reset:hover {
+    color: var(--rose);
+    border-color: var(--rose);
+    background: #fffaf8;
+  }
+
+  .toast {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translate(-50%, -24px);
+    background: var(--rose);
+    color: #fff;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .4s cubic-bezier(.34, 1.3, .64, 1);
+    box-shadow: 0 8px 20px rgba(166,58,60,.3);
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  @media (max-width: 520px) {
+    .card { padding: 32px 20px 22px; border-radius: 22px; }
+    h1 { font-size: 30px; }
+    .options { grid-template-columns: 1fr; }
+    .option .votes { font-size: 26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .heart, .bar i, .toast { transition: none; }
+    .option:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="toast" id="toast"></div>
+
+    <div class="head">
+      <div class="eyebrow">a love experiment</div>
+      <h1>Who loves <span>more?</span></h1>
+    </div>
+
+    <div class="scale">
+      <div class="scale-track">
+        <div class="scale-line"></div>
+        <div class="scale-dot l"></div>
+        <div class="scale-dot r"></div>
+        <div class="heart" id="heart">❤</div>
+      </div>
+      <div class="scale-labels">
+        <span>Ying</span>
+        <span>Adam</span>
+      </div>
+    </div>
+
+    <div class="options">
+      <div class="option" id="optYing" role="button" tabindex="0" aria-label="Vote: Ying loves Adam more">
+        <div class="who">Ying</div>
+        <div class="phrase">loves Adam more</div>
+        <div class="votes"><span id="countYing">0</span><small>votes</small></div>
+        <div class="bar"><i id="barYing"></i></div>
+      </div>
+
+      <div class="option" id="optAdam" role="button" tabindex="0" aria-label="Vote: Adam loves Ying more">
+        <div class="who">Adam</div>
+        <div class="phrase">loves Ying more</div>
+        <div class="votes"><span id="countAdam">0</span><small>votes</small></div>
+        <div class="bar"><i id="barAdam"></i></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="total"><b id="totalVotes">0</b> total votes</div>
+      <button class="reset" id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    var KEY_YING = "loves_more_ying";
+    var KEY_ADAM = "loves_more_adam";
+
+    function load(k) {
+      var v = parseInt(localStorage.getItem(k), 10);
+      return isNaN(v) ? 0 : v;
+    }
+
+    var ying = load(KEY_YING);
+    var adam = load(KEY_ADAM);
+
+    function render() {
+      var total = ying + adam;
+      document.getElementById("countYing").textContent = ying;
+      document.getElementById("countAdam").textContent = adam;
+      document.getElementById("totalVotes").textContent = total;
+
+      var pYing = total > 0 ? Math.round(ying / total * 100) : 0;
+      var pAdam = total > 0 ? Math.round(adam / total * 100) : 0;
+      document.getElementById("barYing").style.width = pYing + "%";
+      document.getElementById("barAdam").style.width = pAdam + "%";
+
+      // heart slides: left 8% (all Ying) -> 92% (all Adam), 50% = tie
+      var heart = document.getElementById("heart");
+      var pos = total > 0 ? 8 + (adam / total) * 84 : 50;
+      heart.style.left = pos + "%";
+    }
+
+    function vote(side) {
+      var label = side === "ying" ? "Ying ❤ Adam" : "Adam ❤ Ying";
+      if (side === "ying") { ying++; localStorage.setItem(KEY_YING, ying); }
+      else { adam++; localStorage.setItem(KEY_ADAM, adam); }
+
+      var toast = document.getElementById("toast");
+      toast.textContent = label + " — noted!";
+      toast.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { toast.classList.remove("show"); }, 1600);
+
+      render();
+    }
+
+    document.getElementById("optYing").addEventListener("click", function () { vote("ying"); });
+    document.getElementById("optAdam").addEventListener("click", function () { vote("adam"); });
+
+    document.getElementById("optYing").addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); vote("ying"); }
+    });
+    document.getElementById("optAdam").addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); vote("adam"); }
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", function () {
+      if (confirm("Reset all votes? This cannot be undone.")) {
+        ying = 0; adam = 0;
+        localStorage.removeItem(KEY_YING);
+        localStorage.removeItem(KEY_ADAM);
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
